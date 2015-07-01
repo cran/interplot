@@ -10,7 +10,7 @@
 
 <meta name="author" content="Frederick Solt and Yue Hu" />
 
-<meta name="date" content="2015-06-26" />
+<meta name="date" content="2015-06-30" />
 
 <title>interplot: Plot the Effects of Variables in Interaction Terms</title>
 
@@ -54,13 +54,21 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div id="header">
 <h1 class="title">interplot: Plot the Effects of Variables in Interaction Terms</h1>
 <h4 class="author"><em>Frederick Solt and Yue Hu</em></h4>
-<h4 class="date"><em>2015-06-26</em></h4>
+<h4 class="date"><em>2015-06-30</em></h4>
 </div>
 
 
 <p>The <code>interplot</code> package is a tool for plotting the conditional coefficients (“marginal effects”) of variables included in multiplicative interaction terms. The function plots the changes in the coefficient of one variable in a two-way interaction term conditional on the value of the other included variable. The plot also includes simulated 95% confidential intervals of these coefficients. In the current version, the function works with ordinary linear regression models, generalized linear models (e.g., logit, probit, ordered logit, etc.), and multilevel (mixed-effects) regressions, all with complete or multiply imputed data.</p>
 <p>Comparing to established alternatives such as <code>effects::plot</code> and <code>sjplot::sjp.int</code>, <code>interplot</code> provides a more user-friendly way to quickly produce plots that are easy to interpret. <code>interplot</code> plots the changes in the <em>conditional coefficient</em> of one variable in the interaction, rather than changes in the dependent variable itself as in the aforementioned functions. This approach avoids displaying interaction effects across multiple panels or multiple lines in favor of a single plot containing all the relevant information. Moreover, by outputting <code>ggplot</code> objects, <code>interplot</code> allows users to easily further customize their graphs.</p>
 <p>This vignette purposes to illustrate how users can apply these functions to improve the presentation of the interactions in their models.</p>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<p>To install:</p>
+<ul>
+<li>the latest released version: <code>install.packages(&quot;interplot&quot;)</code>.</li>
+<li>the latest developing version: <code>devtools::install_github(&quot;sammo3182/interplot&quot;)</code>.</li>
+</ul>
+</div>
 <div id="run-a-model" class="section level2">
 <h2>Run a Model</h2>
 <p>This example is based on the <code>mtcars</code> dataset, which is drawn from the 1974 volume of the US magazine <em>Motor Trend</em>. The dependent variable is mileage in miles per (US) gallon (<code>mpg</code>), and the independent variables are the number of engine cylinders (<code>cyl</code>) and automobile weight in thousands of pounds (<code>wt</code>).</p>
