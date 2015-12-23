@@ -1,3 +1,6 @@
+[![CRAN version](http://www.r-pkg.org/badges/version/interplot)](https://cran.r-project.org/web/packages/interplot/index.html) ![](http://cranlogs.r-pkg.org/badges/grand-total/interplot)
+
+------------------------------------------------------------------------
 interplot
 =========
 
@@ -11,6 +14,6 @@ To install:
 
 
 
-More detail are introducted at:
+More details are available at:
 
 http://cran.r-project.org/web/packages/interplot/vignettes/interplot-vignette.html

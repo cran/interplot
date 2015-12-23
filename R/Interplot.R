@@ -29,9 +29,6 @@
 #' 
 #' @return The function returns a \code{ggplot} object.
 #'
-#' @import  abind 
-#' @import  arm
-#' @import  ggplot2
 #' 
 #' @examples
 #' data(mtcars)
@@ -39,44 +36,45 @@
 #' library(interplot)
 #' 
 #' # Plot interactions with a continous conditioning variable
-#' interplot(m = m_cyl, var1 = "cyl", var2 = "wt") +
-#' xlab("Automobile Weight (thousands lbs)") +
-#' ylab("Estimated Coefficient for Number of Cylinders") +
-#' ggtitle("Estimated Coefficient of Engine Cylinders\non Mileage by Automobile Weight") +
-#' theme(plot.title = element_text(face="bold"))
+#' interplot(m = m_cyl, var1 = 'cyl', var2 = 'wt') +
+#' xlab('Automobile Weight (thousands lbs)') +
+#' ylab('Estimated Coefficient for Number of Cylinders') +
+#' ggtitle('Estimated Coefficient of Engine Cylinders\non Mileage by Automobile Weight') +
+#' theme(plot.title = element_text(face='bold'))
 #' 
 #' 
 #' # Plot interactions with a categorical conditioning variable
-#' interplot(m = m_cyl, var1 = "wt", var2 = "cyl") +
-#' xlab("Number of Cylinders") +
-#' ylab("Estimated Coefficient for Automobile Weight (thousands lbs)") +
-#' ggtitle("Estimated Coefficient of Automobile Weight \non Mileage by Engine Cylinders") +
-#' theme(plot.title = element_text(face="bold"))
+#' interplot(m = m_cyl, var1 = 'wt', var2 = 'cyl') +
+#' xlab('Number of Cylinders') +
+#' ylab('Estimated Coefficient for Automobile Weight (thousands lbs)') +
+#' ggtitle('Estimated Coefficient of Automobile Weight \non Mileage by Engine Cylinders') +
+#' theme(plot.title = element_text(face='bold'))
 #' 
 #' @export
 
 
 
 
-interplot <- function(m, var1, var2, plot = TRUE, point = FALSE, sims = 5000, xmin = NA, xmax = NA) {
+interplot <- function(m, var1, var2, plot = TRUE, point = FALSE, sims = 5000, xmin = NA, 
+    xmax = NA) {
     
     
-    if (class(m) == "list") {
-        if (class(m[[1]]) == "lmerMod") {
+    if (class(m)[1] == "list") {
+        if (class(m[[1]])[1] == "lmerMod") {
             class(m) <- "mlmmi"
         }
-        if (class(m[[1]]) == "glmerMod") {
+        if (class(m[[1]])[1] == "glmerMod") {
             class(m) <- "gmlmmi"
         }
-        if (class(m[[1]]) == "lm") {
+        if (class(m[[1]])[1] == "lm") {
             class(m) <- "lmmi"
         }
-        if (class(m[[1]]) == "glm") {
+        if (class(m[[1]])[1] == "glm") {
             class(m) <- "glmmi"
         }
     }
-  
-    if (class(m) == "data.frame") 
+    
+    if (class(m)[1] == "data.frame") 
         class(m) <- "plot"
     
     
