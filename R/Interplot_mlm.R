@@ -108,7 +108,7 @@ interplot.lmerMod <- function(m, var1, var2, plot = TRUE, point = FALSE, sims = 
         lb = numeric(0), model = character(0))
     
     if (factor_v1) {
-        for (j in 1:(length(levels(eval(parse(text = paste0("m@frame$", var1))))) - 
+        for (j in 1:(length(levels(eval(parse(text = paste0("m@frame$", var1_bk))))) - 
             1)) {
             # only n - 1 interactions; one category is avoided against multicolinarity
             
@@ -135,7 +135,7 @@ interplot.lmerMod <- function(m, var1, var2, plot = TRUE, point = FALSE, sims = 
         interplot.plot(m = coef_df, point = point) + facet_grid(. ~ value)
         
     } else if (factor_v2) {
-        for (j in 1:(length(levels(eval(parse(text = paste0("m@frame$", var2))))) - 
+        for (j in 1:(length(levels(eval(parse(text = paste0("m@frame$", var2_bk))))) - 
             1)) {
             # only n - 1 interactions; one category is avoided against multicolinarity
             
@@ -163,14 +163,17 @@ interplot.lmerMod <- function(m, var1, var2, plot = TRUE, point = FALSE, sims = 
         
         
     } else {
+        ## Correct marginal effect for quadratic terms
+        multiplier <- if (var1 == var2) 2 else 1
+
         for (i in 1:steps) {
             coef$coef1[i] <- mean(m.sims@fixef[, match(var1, unlist(dimnames(m@pp$X)[2]))] + 
-                coef$fake[i] * m.sims@fixef[, match(var12, unlist(dimnames(m@pp$X)[2]))])
+                multiplier * coef$fake[i] * m.sims@fixef[, match(var12, unlist(dimnames(m@pp$X)[2]))])
             coef$ub[i] <- quantile(m.sims@fixef[, match(var1, unlist(dimnames(m@pp$X)[2]))] + 
-                coef$fake[i] * m.sims@fixef[, match(var12, unlist(dimnames(m@pp$X)[2]))], 
+                multiplier * coef$fake[i] * m.sims@fixef[, match(var12, unlist(dimnames(m@pp$X)[2]))], 
                 0.975)
             coef$lb[i] <- quantile(m.sims@fixef[, match(var1, unlist(dimnames(m@pp$X)[2]))] + 
-                coef$fake[i] * m.sims@fixef[, match(var12, unlist(dimnames(m@pp$X)[2]))], 
+                multiplier * coef$fake[i] * m.sims@fixef[, match(var12, unlist(dimnames(m@pp$X)[2]))], 
                 0.025)
         }
         
@@ -267,7 +270,7 @@ interplot.glmerMod <- function(m, var1, var2, plot = TRUE, point = FALSE, sims =
         lb = numeric(0), model = character(0))
     
     if (factor_v1) {
-        for (j in 1:(length(levels(eval(parse(text = paste0("m@frame$", var1))))) - 
+        for (j in 1:(length(levels(eval(parse(text = paste0("m@frame$", var1_bk))))) - 
             1)) {
             # only n - 1 interactions; one category is avoided against multicolinarity
             
@@ -294,7 +297,7 @@ interplot.glmerMod <- function(m, var1, var2, plot = TRUE, point = FALSE, sims =
         interplot.plot(m = coef_df, point = point) + facet_grid(. ~ value)
         
     } else if (factor_v2) {
-        for (j in 1:(length(levels(eval(parse(text = paste0("m@frame$", var2))))) - 
+        for (j in 1:(length(levels(eval(parse(text = paste0("m@frame$", var2_bk))))) - 
             1)) {
             # only n - 1 interactions; one category is avoided against multicolinarity
             
@@ -322,14 +325,17 @@ interplot.glmerMod <- function(m, var1, var2, plot = TRUE, point = FALSE, sims =
         
         
     } else {
+        ## Correct marginal effect for quadratic terms
+        multiplier <- if (var1 == var2) 2 else 1
+
         for (i in 1:steps) {
             coef$coef1[i] <- mean(m.sims@fixef[, match(var1, unlist(dimnames(m@pp$X)[2]))] + 
-                coef$fake[i] * m.sims@fixef[, match(var12, unlist(dimnames(m@pp$X)[2]))])
+                multiplier * coef$fake[i] * m.sims@fixef[, match(var12, unlist(dimnames(m@pp$X)[2]))])
             coef$ub[i] <- quantile(m.sims@fixef[, match(var1, unlist(dimnames(m@pp$X)[2]))] + 
-                coef$fake[i] * m.sims@fixef[, match(var12, unlist(dimnames(m@pp$X)[2]))], 
+                multiplier * coef$fake[i] * m.sims@fixef[, match(var12, unlist(dimnames(m@pp$X)[2]))], 
                 0.975)
             coef$lb[i] <- quantile(m.sims@fixef[, match(var1, unlist(dimnames(m@pp$X)[2]))] + 
-                coef$fake[i] * m.sims@fixef[, match(var12, unlist(dimnames(m@pp$X)[2]))], 
+                multiplier * coef$fake[i] * m.sims@fixef[, match(var12, unlist(dimnames(m@pp$X)[2]))], 
                 0.025)
         }
         
