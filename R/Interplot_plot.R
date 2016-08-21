@@ -12,6 +12,7 @@
 #' @param var1 The name (as a string) of the variable of interest in the interaction term; its conditional coefficient estimates will be plotted.
 #' @param var2 The name (as a string) of the other variable in the interaction term.
 #' @param plot A logical value indicating whether the output is a plot or a dataframe including the conditional coefficient estimates of var1, their upper and lower bounds, and the corresponding values of var2.
+#' @param steps Desired length of the sequence. A non-negative number, which for seq and seq.int will be rounded up if fractional. The default is 100 or the unique categories in the \code{var2} (when it is less than 100. Also see \code{\link{unique}}).
 #' @param hist A logical value indicating if there is a histogram of `var2` added at the bottom of the conditional effect plot.
 #' @param var2_dt A numerical value indicating the frequency distibution of `var2`. It is only used when `hist == TRUE`. When the object is a model, the default is the distribution of `var2` of the model. 
 #' @param point A logical value determining the format of plot. By default, the function produces a line plot when var2 takes on ten or more distinct values and a point (dot-and-whisker) plot otherwise; option TRUE forces a point plot.
@@ -32,16 +33,18 @@
 #' 
 #' @import  ggplot2
 #' @importFrom graphics hist
+#' @importFrom dplyr mutate
 #' 
 #' @export
 
 ## S3 method for class 'data.frame'
-interplot.plot <- function(m, var1, var2, plot = TRUE, hist = FALSE, var2_dt = NULL, point = FALSE, 
-    sims = 5000, xmin = NA, xmax = NA, ercolor = NA, esize = 0.5, ralpha = 0.5, rfill = "grey70", 
-    ...) {
-    steps <- nrow(m)
+interplot.plot <- function(m, var1 = NULL, var2 = NULL, plot = TRUE, steps = NULL, hist = FALSE, var2_dt = NULL, point = FALSE, sims = 5000, xmin = NA, xmax = NA, ercolor = NA, esize = 0.5, ralpha = 0.5, rfill = "grey70", ...) {
+    if(is.null(steps)) steps <- nrow(m)
     levels <- sort(unique(m$fake))
     ymin <- ymax <- vector() # to deal with the "no visible binding for global variable" issue
+    xdiff <- vector() # to deal with the "no visible binding for global variable" issue
+    
+    
     if (hist == FALSE) {
         if (steps < 10 | point == T) {
             if (is.na(ercolor)) 
@@ -57,7 +60,7 @@ interplot.plot <- function(m, var1, var2, plot = TRUE, hist = FALSE, var2_dt = N
         }
         return(coef.plot)
     } else {
-        if (steps < 10 | point == T) {
+        if (point == T) {
             if (is.na(ercolor)) 
                 {
                   ercolor <- "black"
@@ -66,27 +69,45 @@ interplot.plot <- function(m, var1, var2, plot = TRUE, hist = FALSE, var2_dt = N
             yrange <- c(m$ub, m$lb, var2_dt)
             maxdiff <- (max(yrange) - min(yrange))
             
-            break_var2 <- length(unique(var2_dt))
+            break_var2 <- steps + 1
             if (break_var2 >= 100) 
                 break_var2 <- 100
-            hist.out <- hist(var2_dt, breaks = break_var2, plot = FALSE)
+            hist.out <- hist(var2_dt, breaks = seq(min(var2_dt), max(var2_dt), l = break_var2), plot = FALSE)
             
             n.hist <- length(hist.out$mids)
-            dist <- hist.out$mids[2] - hist.out$mids[1]
+            
+            if (steps <10) {dist <- (hist.out$mids[2] - hist.out$mids[1])/3
+            } else {dist <- hist.out$mids[2] - hist.out$mids[1]}
             hist.max <- max(hist.out$counts)
             
-            histX <- data.frame(ymin = rep(min(yrange) - maxdiff/5, n.hist), ymax = hist.out$counts/hist.max * 
-                maxdiff/5 + min(yrange) - maxdiff/5, xmin = hist.out$mids - dist/2, xmax = hist.out$mids + 
-                dist/2)
+            if (steps <10) {
+              histX <- data.frame(ymin = rep(min(yrange) - maxdiff/5, n.hist),
+                                ymax = hist.out$counts/hist.max * maxdiff/5 + min(yrange) - maxdiff/5, 
+                                xmin = sort(unique(var2_dt)) - dist/2, 
+                                xmax = sort(unique(var2_dt)) + dist/2)
+            } else {
+              histX <- data.frame(ymin = rep(min(yrange) - maxdiff/5, n.hist), 
+                                  ymax = hist.out$counts/hist.max * maxdiff/5 + min(yrange) - maxdiff/5, 
+                                  xmin = hist.out$mids - dist/2, 
+                                  xmax = hist.out$mids + dist/2)
+                                } 
+            #when up to 10, the sort(unique(var2_dt)) - dist/2 leads to problemtic histogram
+            
+            
+            if (steps <10) {
+              histX_sub <- histX
+            } else {
+              histX_sub <- mutate(histX, xdiff = xmax - xmin, xmax = xmax - xdiff/2)
+            }
             
             coef.plot <- ggplot()
             coef.plot <- coef.plot + geom_rect(data = histX, aes(xmin = xmin, xmax = xmax, ymin = ymin, 
                 ymax = ymax), colour = "gray50", alpha = 0, size = 0.5)  #histgram
             
-            coef.plot <- coef.plot + geom_point(data = m, aes_string(x = "fake", y = "coef1")) + 
+            coef.plot <- coef.plot +
                 geom_errorbar(data = m, aes_string(x = "fake", ymin = "lb", ymax = "ub"), width = 0, 
                   color = ercolor, size = esize) + scale_x_continuous(breaks = levels) + ylab(NULL) + 
-                xlab(NULL)
+                xlab(NULL) + geom_point(data = m, aes_string(x = "fake", y = "coef1")) 
             
         } else {
             
