@@ -8,8 +8,11 @@
 #' @param plot A logical value indicating whether the output is a plot or a dataframe including the conditional coefficient estimates of var1, their upper and lower bounds, and the corresponding values of var2.
 #' @param steps Desired length of the sequence. A non-negative number, which for seq and seq.int will be rounded up if fractional. The default is 100 or the unique categories in the \code{var2} (when it is less than 100. Also see \code{\link{unique}}).
 #' @param ci A numeric value defining the confidence intervals. The default value is 95\% (0.95).
+#' @param adjCI A logical value indication if applying the adjustment of confidence intervals to control the false discovery rate following the Esarey and Sumner (2017) procedure. (See also Benjamini and Hochberg 1995.) The default is FALSE; the plot presents the confidence intervals suggested by Brambor, Clark, and Golder (2006). The functions dealing with multilevel model outputs in this package do not equip with this argument, because there is the controversy on the accurate degrees of freedom for multilevel models, esp. when random effect is engaged and the degrees of freedom is a necessary information to conduct the CI adjustment. See e.g., https://stat.ethz.ch/pipermail/r-help/2006-May/094765.html and https://stat.ethz.ch/pipermail/r-sig-mixed-models/2008q1/000517.html. 
 #' @param hist A logical value indicating if there is a histogram of `var2` added at the bottom of the conditional effect plot.
-#' @param var2_dt A numerical value indicating the frequency distibution of `var2`. It is only used when `hist == TRUE`. When the object is a model, the default is the distribution of `var2` of the model.  
+#' @param var2_dt A numerical value indicating the frequency distribution of `var2`. It is only used when `hist == TRUE`. When the object is a model, the default is the distribution of `var2` of the model.  
+#' @param predPro A logical value with default of `FALSE`. When the `m` is an object of class `glm` or `glmerMod` and the argument is set to `TRUE`, the function will plot predicted probabilities at the values given by `var2_vals`. 
+#' @param var2_vals A numerical value indicating the values the predicted probabilities are estimated, when `predPro` is `TRUE`. 
 #' @param point A logical value determining the format of plot. By default, the function produces a line plot when var2 takes on ten or more distinct values and a point (dot-and-whisker) plot otherwise; option TRUE forces a point plot.
 #' @param sims Number of independent simulation draws used to calculate upper and lower bounds of coefficient estimates: lower values run faster; higher values produce smoother curves.
 #' @param xmin A numerical value indicating the minimum value shown of x shown in the graph. Rarely used.
@@ -59,15 +62,24 @@
 #' ggtitle('Estimated Coefficient of Automobile Weight \non Mileage by Engine Cylinders') +
 #' theme(plot.title = element_text(face='bold'))
 #' 
+#' @source Benjamini, Yoav, and Yosef Hochberg. 1995. "Controlling the False
+#' Discovery Rate: A Practical and Powerful Approach to Multiple Testing".
+#' Journal of the Royal Statistical Society, Series B 57(1): 289--300.
+#'
+#' Brambor, Thomas, William Roberts Clark, and Matt Golder.
+#' "Understanding interaction models: Improving empirical analyses". Political
+#' Analysis 14.1 (2006): 63-82.
+#'
+#' Esarey, Justin, and Jane Lawrence Sumner. 2015. "Marginal Effects in
+#' Interaction Models: Determining and Controlling the False Positive Rate".
+#' URL: \url{http://jee3.web.rice.edu/interaction-overconfidence.pdf}.
+#' 
 #' @export
 
 
-
-
-interplot <- function(m, var1, var2, plot = TRUE, steps = NULL, ci = .95, 
-                      hist = FALSE, var2_dt = NA, point = FALSE, sims = 5000, 
-                      xmin = NA, xmax = NA, ercolor = NA, esize = 0.5, 
-                      ralpha = 0.5, rfill = "grey70", ...) {
+interplot <- function(m, var1, var2, plot = TRUE, steps = NULL, ci = .95, adjCI = FALSE, hist = FALSE, var2_dt = NA, predPro = FALSE, var2_vals = NULL, point = FALSE, sims = 5000, xmin = NA, xmax = NA, ercolor = NA, esize = 0.5, ralpha = 0.5, rfill = "grey70", ...) {
+  
+  
     if (class(m)[1] == "list") {
         if (class(m[[1]])[1] == "lmerMod") {
             class(m) <- "mlmmi"

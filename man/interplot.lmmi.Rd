@@ -3,9 +3,23 @@
 \name{interplot.lmmi}
 \alias{interplot.lmmi}
 \title{Plot Conditional Coefficients in (Generalized) Linear Models with Imputed Data and Interaction Terms}
+\source{
+Benjamini, Yoav, and Yosef Hochberg. 1995. "Controlling the False
+Discovery Rate: A Practical and Powerful Approach to Multiple Testing".
+Journal of the Royal Statistical Society, Series B 57(1): 289--300.
+
+Brambor, Thomas, William Roberts Clark, and Matt Golder.
+"Understanding interaction models: Improving empirical analyses". Political
+Analysis 14.1 (2006): 63-82.
+
+Esarey, Justin, and Jane Lawrence Sumner. 2015. "Marginal Effects in
+Interaction Models: Determining and Controlling the False Positive Rate".
+URL: \url{http://jee3.web.rice.edu/interaction-overconfidence.pdf}.
+}
 \usage{
 \method{interplot}{lmmi}(m, var1, var2, plot = TRUE, steps = NULL,
-  ci = 0.95, hist = FALSE, var2_dt = NA, point = FALSE, sims = 5000,
+  ci = 0.95, adjCI = FALSE, hist = FALSE, var2_dt = NA,
+  predPro = FALSE, var2_vals = NULL, point = FALSE, sims = 5000,
   xmin = NA, xmax = NA, ercolor = NA, esize = 0.5, ralpha = 0.5,
   rfill = "grey70", ...)
 }
@@ -22,9 +36,15 @@
 
 \item{ci}{A numeric value defining the confidence intervals. The default value is 95\% (0.95).}
 
+\item{adjCI}{A logical value indication if applying the adjustment of confidence intervals to control the false discovery rate following the Esarey and Sumner (2017) procedure. (See also Benjamini and Hochberg 1995.) The default is FALSE; the plot presents the confidence intervals suggested by Brambor, Clark, and Golder (2006).}
+
 \item{hist}{A logical value indicating if there is a histogram of `var2` added at the bottom of the conditional effect plot.}
 
-\item{var2_dt}{A numerical value indicating the frequency distibution of `var2`. It is only used when `hist == TRUE`. When the object is a model, the default is the distribution of `var2` of the model.}
+\item{var2_dt}{A numerical value indicating the frequency distribution of `var2`. It is only used when `hist == TRUE`. When the object is a model, the default is the distribution of `var2` of the model.}
+
+\item{predPro}{A logical value with default of `FALSE`. When the `m` is an object of class `glm` and the argument is set to `TRUE`, the function will plot predicted probabilities at the values given by `var2_vals`.}
+
+\item{var2_vals}{A numerical value indicating the values the predicted probabilities are estimated, when `predPro` is `TRUE`.}
 
 \item{point}{A logical value determining the format of plot. By default, the function produces a line plot when var2 takes on ten or more distinct values and a point (dot-and-whisker) plot otherwise; option TRUE forces a point plot.}
 
@@ -55,4 +75,3 @@ The function returns a \code{ggplot} object.
 
 Because the output function is based on \code{\link[ggplot2]{ggplot}}, any additional arguments and layers supported by \code{ggplot2} can be added with the \code{+}.
 }
-
